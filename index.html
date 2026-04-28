@@ -81,7 +81,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 .player-stage{
   width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center;
-  padding:0 32px 80px; flex:1; justify-content:center; min-height:0;
+  padding:0 32px 130px; /* Increased bottom padding to clear nav */
+  flex:1; justify-content:center; min-height:0;
 }
 .art-wrap{ width:100%; display:flex; justify-content:center; flex-shrink:0; }
 .controls-wrap{ width:100%; display:flex; flex-direction:column; min-width:0; }
@@ -173,16 +174,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .play-btn:hover{transform:scale(1.08);box-shadow:0 0 44px rgba(var(--c1),.65);}
 .play-btn:active{transform:scale(.94) !important;box-shadow:0 0 16px rgba(var(--c1),.3);}
 
-.sec-row{ width:100%;display:flex;align-items:center; justify-content:space-between;margin-top:10px; }
-.sec-btn{
-  width:34px;height:34px;border-radius:var(--r-xs);border:none;background:none; color:var(--muted);cursor:pointer;font-size:15px;
-  display:flex;align-items:center;justify-content:center; transition:color var(--t1),transform 200ms var(--ease-bounce);
-}
-.sec-btn:hover{color:var(--text);}
-.sec-btn:active{transform:scale(.88);}
-.sec-btn.lit{color:var(--accent);}
-.sec-row-right{display:flex;gap:2px;}
-
 /* ══════════════════════════════════════
    EXPANDED ART MODE
    ══════════════════════════════════════ */
@@ -240,12 +231,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   display:flex;align-items:center;gap:8px;
   background:rgba(255,255,255,.08);backdrop-filter:blur(16px);
   border:1px solid rgba(255,255,255,.1);
-  border-radius:4px; /* Square edges for pill */
+  border-radius:4px;
   padding:5px 12px 5px 5px;max-width:220px;overflow:hidden;
 }
 .lyr-pill-art{
   width:24px;height:24px;
-  border-radius:4px; /* Square edges for pill art */
+  border-radius:4px;
   overflow:hidden; background:var(--s2);flex-shrink:0;
 }
 .lyr-pill-art img{width:100%;height:100%;object-fit:cover;}
@@ -285,7 +276,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .lyr-line:hover{background:rgba(255,255,255,.04);}
 .ll-text{
   display:block; 
-  font-size:clamp(32px,7vw,44px); /* Increased lyrics font size */
+  font-size:clamp(32px,7vw,44px);
   font-weight:700;letter-spacing:-.022em;line-height:1.3;
   word-wrap:break-word;overflow-wrap:break-word; color:rgba(255,255,255,.3);
   transform:translate3d(0,0,0) scale3d(.88,.88,1); transform-origin:left center;
@@ -311,8 +302,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 /* ── Mobile Lyrics Controls ── */
 .lyr-controls{
-  flex-shrink:0; padding:12px 20px max(env(safe-area-inset-bottom, 85px), 85px);
-  /* Removed frosted glass background to unify lyrics view */
+  flex-shrink:0; padding:12px 20px max(env(safe-area-inset-bottom, 110px), 110px);
   background:transparent; backdrop-filter:none; border-top:none;
   display:none; position:relative; z-index:10;
 }
@@ -372,7 +362,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .lib-search:focus{background:var(--s2);border-color:rgba(var(--c1),.3);}
 .lib-search::placeholder{color:var(--muted2);}
 
-#track-list{flex:1;overflow-y:auto;padding:8px 16px max(env(safe-area-inset-bottom,90px),90px);}
+#track-list{flex:1;overflow-y:auto;padding:8px 16px max(env(safe-area-inset-bottom,120px),120px);}
 #track-list::-webkit-scrollbar{width:2px;}
 #track-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 
@@ -447,7 +437,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .about-header-txt{min-width:0;flex:1;}
 .about-header-title{font-size:16px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .about-header-sub{font-size:12px;color:var(--muted);margin-top:3px;}
-.about-content{flex:1;overflow-y:auto;padding:28px 32px max(env(safe-area-inset-bottom,90px),90px);}
+.about-content{flex:1;overflow-y:auto;padding:28px 32px max(env(safe-area-inset-bottom,120px),120px);}
 .about-content::-webkit-scrollbar{width:2px;}
 .about-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
 .about-section{margin-bottom:36px;opacity:0;transform:translateY(10px);transition:opacity 320ms var(--ease-spring),transform 320ms var(--ease-spring);}
@@ -499,12 +489,12 @@ body.drag-over::after{
    ══════════════════════════════════════ */
 @media (max-width: 767px), (orientation: portrait) {
   .lyr-controls{display:flex;flex-direction:column;}
-  .player-stage{padding:0 22px 80px;max-width:100%;}
+  .player-stage{padding:0 22px 130px;max-width:100%;}
   .player-topbar{padding:14px 20px 0;}
 }
 @media (max-width: 480px){ .ll-text{font-size:clamp(28px,8vw,36px);} }
 @media (max-width: 380px){
-  .player-stage{padding:0 18px 80px;} #bottom-nav{padding:5px 6px;} .nav-pill{padding:7px 12px;font-size:11px;}
+  .player-stage{padding:0 18px 130px;} #bottom-nav{padding:5px 6px;} .nav-pill{padding:7px 12px;font-size:11px;}
 }
 
 /* ══════════════════════════════════════
@@ -566,7 +556,6 @@ body.drag-over::after{
 <div id="bg"><div id="bg-inner"><div id="bg-a" class="bg-drift"></div><div id="bg-b"></div></div><div id="bg-noise"></div><div id="bg-vignette"></div></div>
 
 <div id="app">
-  <!-- ══ PLAYER VIEW (LEFT PANE) ══ -->
   <div class="view active" id="view-player">
     <div class="player-topbar">
       <div class="topbar-logo">Aether</div>
@@ -599,14 +588,10 @@ body.drag-over::after{
           <button class="ctrl-btn" onclick="nextTrack()"><i class="fas fa-forward-step"></i></button>
           <button class="ctrl-btn" id="btn-repeat" onclick="cycleRepeat()"><i id="rep-all" class="fas fa-repeat"></i><span id="rep-one" style="display:none;position:relative;"><i class="fas fa-repeat"></i><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;font-weight:800;">1</span></span></button>
         </div>
-        <div class="sec-row">
-          <div class="sec-row-right"><button class="sec-btn lit" id="btn-lyrics" onclick="showView('lyrics')"><i class="fa-regular fa-file-lines"></i></button></div>        
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ LYRICS VIEW (RIGHT PANE) ══ -->
   <div class="view" id="view-lyrics">
     <div class="lyrics-topbar">
       <div class="lyr-pill">
@@ -631,7 +616,6 @@ body.drag-over::after{
     </div>
   </div>
 
-  <!-- ══ LIBRARY / QUEUE VIEW (RIGHT PANE) ══ -->
   <div class="view" id="view-library">
     <div class="lib-topbar">
       <div class="lib-title-group"><div class="lib-title">Queue</div><div class="lib-count" id="lib-count">0 tracks</div></div>
@@ -656,14 +640,12 @@ body.drag-over::after{
   </div>
 </div>
 
-<!-- ══ BOTTOM NAV (MOBILE) ══ -->
 <nav id="bottom-nav">
   <button class="nav-pill active" id="nav-player" onclick="showView('player')"><i class="fas fa-music"></i> Player</button>
   <button class="nav-pill" id="nav-lyrics" onclick="showView('lyrics')"><i class="fa-regular fa-file-lines"></i> Lyrics</button>
   <button class="nav-pill" id="nav-library" onclick="showView('library')"><i class="fas fa-list"></i> Queue</button>
 </nav>
 
-<!-- ══ DESKTOP BOTTOM CONTROL BAR ══ -->
 <div id="desktop-bottom-bar">
   <div class="dt-prog-area">
     <span class="dt-time" id="dt-time-cur">0:00</span>
@@ -683,7 +665,6 @@ body.drag-over::after{
   </div>
 </div>
 
-<!-- ══ EXPANDED ART MODE ══ -->
 <div id="expanded-art">
   <div id="exp-cover-wrap"><div id="exp-art-placeholder"><i class="fas fa-music"></i></div><img id="exp-cover" alt="" style="display:none"/></div>
   <div id="exp-overlay"></div>
@@ -706,7 +687,6 @@ body.drag-over::after{
   </div>
 </div>
 
-<!-- ══ ABOUT SONG SCREEN ══ -->
 <div id="about-screen">
   <div class="about-header">
     <button class="about-back" onclick="closeAbout()"><i class="fas fa-chevron-down"></i></button>
@@ -728,7 +708,7 @@ body.drag-over::after{
 'use strict';
 
 /* ═══ CONFIG ═══ */
-const GENIUS_TOKEN = 'uUO2G8JN8c8RoIOUpahL6g20D471pngc93vRD_9N9CWbl2igqUJDTQBW9JiquvP3'; // Paste your Genius Client Access Token here
+const GENIUS_TOKEN = "****"; // Paste your Genius Client Access Token here
 
 /* ═══ UTILS ═══ */
 const $ = s => document.querySelector(s);
