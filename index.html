@@ -39,10 +39,19 @@
 
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-size:14px;}
 
-/* ── DYNAMIC BACKGROUND ── */
+/* ── DYNAMIC BACKGROUND (GPU ACCELERATED) ── */
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:var(--bg);}
-#bg-inner{position:absolute;inset:-25%;width:150%;height:150%;will-change:transform;}
-#bg-a,#bg-b{position:absolute;inset:0;will-change:opacity;transition:opacity 2s cubic-bezier(.45,0,.55,1);}
+#bg-inner{
+  position:absolute;inset:-25%;width:150%;height:150%;
+  will-change:transform; transform: translateZ(0); backface-visibility: hidden;
+}
+#bg-a,#bg-b{
+  position:absolute;inset:0;
+  will-change:opacity, transform; 
+  transform: translateZ(0); 
+  backface-visibility: hidden;
+  transition:opacity 2s cubic-bezier(.45,0,.55,1);
+}
 #bg-b{opacity:0;}
 .bg-drift{animation:bgDrift 40s ease-in-out infinite alternate;}
 @keyframes bgDrift{
@@ -81,7 +90,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 .player-stage{
   width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center;
-  padding:0 32px 40px; /* Reduced padding since bottom nav is gone */
+  padding:0 32px 40px; 
   flex:1; justify-content:center; min-height:0;
 }
 .art-wrap{ width:100%; display:flex; justify-content:center; flex-shrink:0; }
@@ -163,6 +172,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ctrl-btn{
   background:none;border:none;cursor:pointer; color:var(--muted);display:flex;align-items:center;justify-content:center;
   width:40px;height:40px;border-radius:50%;font-size:18px; transition:color var(--t1),transform 200ms var(--ease-bounce);
+  position: relative; /* Base for strict layout locking */
 }
 .ctrl-btn:hover{color:var(--text);}
 .ctrl-btn:active{transform:scale(.88);}
@@ -173,6 +183,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 }
 .play-btn:hover{transform:scale(1.08);box-shadow:0 0 44px rgba(var(--c1),.65);}
 .play-btn:active{transform:scale(.94) !important;box-shadow:0 0 16px rgba(var(--c1),.3);}
+
+/* STRICT REPEAT BUTTON ALIGNMENT */
+#rep-all, #rep-one, #exp-rep-all, #exp-rep-one, #lyr-rep-all, #lyr-rep-one, #dt-rep-all, #dt-rep-one {
+  position: absolute !important;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
 
 /* Secondary Row: Queue on Left, Lyrics on Right */
 .sec-row{ width:100%;display:flex;align-items:center; justify-content:space-between;margin-top:10px; }
@@ -219,7 +236,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .exp-prog-fill{ height:100%;border-radius:99px;background:#fff;pointer-events:none; box-shadow:0 0 8px rgba(255,255,255,.4); }
 .exp-time-row{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.45);margin-top:6px;font-variant-numeric:tabular-nums;}
 .exp-ctrl-row{ display:flex;align-items:center;justify-content:space-between; margin-top:20px;padding:0 4px; }
-.exp-ctrl-btn{ background:none;border:none;cursor:pointer;color:rgba(255,255,255,.55); width:40px;height:40px;border-radius:50%;font-size:18px; display:flex;align-items:center;justify-content:center; transition:color var(--t1),transform 200ms var(--ease-bounce); }
+.exp-ctrl-btn{ background:none;border:none;cursor:pointer;color:rgba(255,255,255,.55); width:40px;height:40px;border-radius:50%;font-size:18px; display:flex;align-items:center;justify-content:center; transition:color var(--t1),transform 200ms var(--ease-bounce); position: relative; }
 .exp-ctrl-btn:hover{color:#fff;}
 .exp-ctrl-btn:active{transform:scale(.88);}
 .exp-ctrl-btn.lit{color:rgba(var(--c1),1);}
@@ -229,7 +246,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #exp-art-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.06;}
 
 /* ══════════════════════════════════════
-   LYRICS VIEW
+   LYRICS VIEW & GPU ACCELERATION
    ══════════════════════════════════════ */
 #view-lyrics{overflow:hidden;}
 
@@ -264,7 +281,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .lyr-close-btn:hover{background:rgba(255,255,255,.18);}
 .lyr-close-btn:active{transform:scale(.9);}
 
-/* Fades the scrolling text elegantly out at the top and bottom */
 #lyrics-scroll-wrap{
   flex:1;position:relative;overflow:hidden;touch-action:none; min-height:0;
   mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
@@ -274,6 +290,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   position:absolute;top:0;left:0;right:0;
   padding:4vh 28px 40vh 20px;
   will-change:transform; transform:translate3d(0,0,0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .lyr-line{
@@ -281,25 +299,54 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   user-select:none; transition:background 200ms ease;
 }
 .lyr-line:hover{background:rgba(255,255,255,.04);}
+
+/* ── LYRICS TEXT UPGRADE ── */
 .ll-text{
   display:block; 
-  font-size:clamp(32px,7vw,44px);
-  font-weight:700;letter-spacing:-.022em;line-height:1.3;
+  font-size:clamp(24px, 6vw, 36px); /* Bumped down as requested */
+  font-weight:700;letter-spacing:-.022em;line-height:1.2;
   word-wrap:break-word;overflow-wrap:break-word; color:rgba(255,255,255,.3);
   transform:translate3d(0,0,0) scale3d(.88,.88,1); transform-origin:left center;
-  will-change:transform,color,text-shadow; transition:transform 650ms cubic-bezier(.2,.9,.3,1),color 650ms cubic-bezier(.2,.9,.3,1),text-shadow 650ms ease;
+  will-change: transform, color, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition:transform 650ms cubic-bezier(.2,.9,.3,1),color 650ms cubic-bezier(.2,.9,.3,1);
 }
 .lyr-line.active .ll-text{
-  color:rgba(255,255,255,1); transform:translate3d(0,0,0) scale3d(.97,.97,1); text-shadow:0 4px 20px rgba(0,0,0,.4);
+  color:rgba(255,255,255,1); transform:translate3d(0,0,0) scale3d(.97,.97,1); 
 }
 .lyr-line.past .ll-text{ color:rgba(255,255,255,.4); transform:translate3d(0,0,0) scale3d(.91,.91,1); }
+
+/* ── BRACKETED VOCALS ── */
 .ll-bgvocal{
-  display:block;font-size:16px;font-weight:600;margin-left:4px; max-height:0;opacity:0;margin-top:0;
-  color:rgba(255,255,255,.18); transform:translate3d(0,0,0) scale3d(.88,.88,1); transform-origin:left center;
-  will-change:transform,color,opacity,max-height; transition:transform 650ms cubic-bezier(.2,.9,.3,1),color 650ms cubic-bezier(.2,.9,.3,1),max-height 380ms cubic-bezier(.2,.9,.3,1),margin-top 380ms cubic-bezier(.2,.9,.3,1),opacity 450ms ease;
+  display:block;
+  font-size:clamp(14px, 3.5vw, 18px); /* Much smaller */
+  font-weight:600;
+  margin-left:0; /* Perfect alignment */
+  margin-top:0; /* Starts collapsed */
+  max-height:0; /* Collapsed state to prevent empty holes between lyrics */
+  overflow:hidden;
+  opacity:0;
+  color:rgba(255,255,255,.18); 
+  transform:translate3d(-10px,0,0) scale3d(.88,.88,1); transform-origin:left center;
+  will-change: transform, color, opacity, max-height, margin-top;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition:transform 650ms cubic-bezier(.2,.9,.3,1),color 650ms cubic-bezier(.2,.9,.3,1), opacity 450ms ease, max-height 380ms ease, margin-top 380ms ease;
 }
-.lyr-line.active .ll-bgvocal{max-height:2em;opacity:1;margin-top:5px;color:rgba(255,255,255,.55);transform:translate3d(0,0,0) scale3d(1,1,1);}
-.lyr-line.past .ll-bgvocal{max-height:0;opacity:0;margin-top:0;color:rgba(255,255,255,.28);}
+.lyr-line.active .ll-bgvocal{
+  opacity:1;
+  max-height:2em; /* Expands smoothly */
+  margin-top:4px; /* Unifies spacing when visible */
+  color:rgba(255,255,255,.55);
+  transform:translate3d(0,0,0) scale3d(1,1,1);
+}
+.lyr-line.past .ll-bgvocal{ 
+  opacity:0; 
+  max-height:0; /* Folds away so gaps are completely unified */
+  margin-top:0;
+}
+
 .lyric-plain{padding:5px 0;font-size:24px;font-weight:600;line-height:1.6;color:rgba(255,255,255,.65);word-wrap:break-word;}
 .lyr-status{padding:32px 0;font-size:14px;color:rgba(255,255,255,.35);text-align:center;}
 .lrclib-attr{
@@ -321,7 +368,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .lyr-ctrl-btn{
   background:none;border:none;cursor:pointer;color:rgba(255,255,255,.45);
   width:38px;height:38px;border-radius:50%;font-size:17px; display:flex;align-items:center;justify-content:center;
-  transition:color var(--t1),transform 200ms var(--ease-bounce);
+  transition:color var(--t1),transform 200ms var(--ease-bounce); position: relative;
 }
 .lyr-ctrl-btn:hover{color:rgba(255,255,255,.85);}
 .lyr-ctrl-btn:active{transform:scale(.88);}
@@ -487,7 +534,10 @@ body.drag-over::after{
   .player-stage{padding:0 22px 40px;max-width:100%;}
   .player-topbar{padding:14px 20px 0;}
 }
-@media (max-width: 480px){ .ll-text{font-size:clamp(28px,8vw,36px);} }
+@media (max-width: 480px){ 
+  .ll-text{font-size:clamp(26px,8vw,34px);} 
+  .ll-bgvocal{font-size:clamp(14px,4vw,18px);} 
+}
 @media (max-width: 380px){
   .player-stage{padding:0 18px 40px;}
 }
@@ -523,7 +573,7 @@ body.drag-over::after{
   .art-wrap { width: 100%; max-width: 460px; margin: 0 auto; }
   .art-container { max-width: 100%; max-height: calc(100vh - 300px); }
   .controls-wrap { width: 100%; max-width: 460px; margin: 0 auto; }
-  .np-info { margin-top: 32px; text-align: left; align-items: center; }
+  .np-info { margin margin-top: 32px; text-align: left; align-items: center; }
   #np-title { font-size: clamp(24px, 3.5vw, 34px); }
   #np-artist { font-size: 16px; margin-top: 6px; }
 
@@ -776,18 +826,74 @@ function showView(view, dir='left'){
   if(view==='lyrics') startScrollLoop();
 }
 
+/* ═══ META EXTRACTION ENGINE ═══ */
+function cleanFilename(filename) {
+  let cleaned = filename.replace(/\.[^/.]+$/, ""); // Remove extension
+  cleaned = cleaned.replace(/[\[\(][^\]\)]*(official|lyrics|audio|video|music)[^\]\)]*[\]\)]/gi, "");
+  cleaned = cleaned.replace(/\b(official|lyrics|audio|video|music)\b/gi, "");
+  cleaned = cleaned.replace(/_\d+$/, "");
+  return cleaned.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function extractArtistAndTitle(cleanedName) {
+  let artist = "Unknown Artist";
+  let title = cleanedName;
+
+  const standardMatch = cleanedName.match(/^(.*?)\s*[-~|]\s*(.*)$/);
+  if (standardMatch) {
+    artist = standardMatch[1].trim();
+    title = standardMatch[2].trim();
+  } else {
+    const ftMatch = cleanedName.match(/^(.*?)\s+(?:ft\.?|feat\.?|featuring)\s+(.*)$/i);
+    if (ftMatch) {
+      title = ftMatch[1].trim();
+      artist = ftMatch[2].trim();
+    }
+  }
+
+  const titleFeatMatch = title.match(/^(.*?)\s*[\(\[]?(?:ft\.?|feat\.?|featuring|&)\s+(.*?)[\)\]]?$/i);
+  if (titleFeatMatch && artist !== "Unknown Artist") {
+    title = titleFeatMatch[1].trim();
+    artist = `${artist}, ${titleFeatMatch[2].trim()}`; 
+  }
+
+  const toTitleCase = (str) => str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  return { title: toTitleCase(title), artist: toTitleCase(artist) };
+}
+
 /* ═══ FILE INGESTION ═══ */
 function readMeta(file){ return new Promise(res=>{
-  const url=URL.createObjectURL(file); const name=file.name.replace(/\.[^.]+$/,''); const fb={id:uid(),file,url,title:name,artist:'Unknown Artist',album:'',coverArt:null,duration:0};
-  if(typeof jsmediatags==='undefined'){res(fb);return;}
+  const url=URL.createObjectURL(file); 
+  const rawName=file.name.replace(/\.[^.]+$/,''); 
+  
+  // Fallback info generator using our extraction engine
+  const getFallback = () => {
+    const { title, artist } = extractArtistAndTitle(cleanFilename(file.name));
+    return {id:uid(),file,url,title,artist,album:'',coverArt:null,duration:0};
+  };
+
+  if(typeof jsmediatags==='undefined'){res(getFallback());return;}
+  
   jsmediatags.read(file,{
     onSuccess(tag){
       const t=tag.tags; let art=null;
       if(t.picture){const {data,format}=t.picture;const bt=new Uint8Array(data);let s='';bt.forEach(b=>s+=String.fromCharCode(b));art=`data:${format};base64,${btoa(s)}`;}
-      res({id:uid(),file,url,title:t.title||name,artist:t.artist||'Unknown Artist',album:t.album||'',coverArt:art,duration:0});
-    }, onError(){res(fb);}
+      
+      let title = t.title ? t.title.trim() : null;
+      let artist = t.artist ? t.artist.trim() : null;
+
+      // If metadata is garbage or just the filename, use smart extraction
+      if (!title || title === rawName) {
+        const ext = extractArtistAndTitle(cleanFilename(file.name));
+        title = ext.title;
+        if (!artist || artist === 'Unknown Artist') artist = ext.artist;
+      }
+      
+      res({id:uid(),file,url,title,artist:artist||'Unknown Artist',album:t.album||'',coverArt:art,duration:0});
+    }, onError(){res(getFallback());}
   });
 });}
+
 async function addFiles(files){
   const af=Array.from(files).filter(f=>f.type.startsWith('audio/')||/\.(mp3|flac|aac|m4a|wav|ogg|opus)$/i.test(f.name));
   if(!af.length){toast('No audio files found');return;} toast(`Loading ${af.length} file${af.length>1?'s':''}…`);
@@ -917,20 +1023,40 @@ function resetTheme(){
 async function fetchLyrics(track){
   const panel=$('#lyrics-panel'); panel.innerHTML='<div class="lyr-status">Loading lyrics…</div>';
   S.lyricsData=[]; S.lyricsMode='none'; S.activeLineIdx=-1; S.lineNodes=[]; S.scrollY=0; S.scrollTarget=0;
-  if(!track.title||track.title==='Unknown Artist'){ panel.innerHTML=noLyrMsg('No metadata'); return; }
-  try{
-    const q=new URLSearchParams({track_name:track.title,artist_name:track.artist});
-    const res=await fetch(`https://lrclib.net/api/get?${q}`);
-    if(!res.ok) throw new Error();
-    const data=await res.json();
-    if(data.syncedLyrics){ S.lyricsData=parseLrc(data.syncedLyrics); S.lyricsMode='line'; buildLyricsUI(); }
+  
+  if(!track.title||track.title==='Unknown Artist'){ 
+    panel.innerHTML=noLyrMsg('No metadata'); 
+    return; 
+  }
+  
+  try {
+    const q = new URLSearchParams({
+      track_name: track.title,
+      artist_name: track.artist !== 'Unknown Artist' ? track.artist : ''
+    });
+    
+    const res = await fetch(`https://lrclib.net/api/get?${q}`);
+    if (!res.ok) throw new Error();
+    
+    const data = await res.json();
+    
+    if(data.syncedLyrics){ 
+      S.lyricsData=parseLrc(data.syncedLyrics); 
+      S.lyricsMode='line'; 
+      buildLyricsUI(); 
+    }
     else if(data.plainLyrics){ 
       S.lyricsMode='plain'; 
       panel.innerHTML = data.plainLyrics.split('\n').map(l=>`<div class="lyric-plain">${esc(l)||'&nbsp;'}</div>`).join('') + '<div class="lrclib-attr">Lyrics provided by LRCLIB</div>';
     }
-    else throw new Error();
-  } catch{ panel.innerHTML=noLyrMsg('Lyrics not found'); }
+    else {
+      throw new Error();
+    }
+  } catch { 
+    panel.innerHTML=noLyrMsg('Lyrics not found'); 
+  }
 }
+
 function parseLrc(lrc){
   const lines=[]; const rx=/\[(\d+):(\d+\.\d+)\](.*)/;
   lrc.split('\n').forEach(line=>{const m=line.match(rx);if(!m)return;const time=parseInt(m[1])*60+parseFloat(m[2]);const raw=m[3].trim();if(!raw)return;lines.push({time,text:raw});});
@@ -962,13 +1088,27 @@ function noLyrMsg(m){ return `<div class="lyr-status">${esc(m)}</div>`; }
 
 function startScrollLoop(){
   if(S.scrollLoopActive) return; S.scrollLoopActive=true; const ANCHOR=90;
+  
+  // Cache the DOM elements outside the animation loop
+  const wrap = $('#lyrics-scroll-wrap');
+  const inner = $('#lyrics-inner');
+  
   function loop(){
     if(S.currentView!=='lyrics'){ S.scrollLoopActive=false; return; }
-    if(S.autoScroll&&!S.isDragging&&S.activeLineIdx>=0){ const node=S.lineNodes[S.activeLineIdx]; if(node) S.scrollTarget=node.el.offsetTop-ANCHOR; }
-    const wrap=$('#lyrics-scroll-wrap'), inner=$('#lyrics-inner'), maxScroll=Math.max(0,inner.scrollHeight-wrap.clientHeight);
-    S.scrollTarget=Math.max(0,Math.min(S.scrollTarget,maxScroll));
-    if(S.isDragging) S.scrollY=S.scrollTarget; else S.scrollY+=(S.scrollTarget-S.scrollY)*.14;
-    inner.style.transform=`translate3d(0,${-S.scrollY}px,0)`; requestAnimationFrame(loop);
+    if(S.autoScroll&&!S.isDragging&&S.activeLineIdx>=0){ 
+      const node=S.lineNodes[S.activeLineIdx]; 
+      if(node) S.scrollTarget=node.el.offsetTop-ANCHOR; 
+    }
+    
+    // Safely calculate scroll bounds using cached elements
+    const maxScroll = Math.max(0, inner.scrollHeight - wrap.clientHeight);
+    S.scrollTarget = Math.max(0, Math.min(S.scrollTarget, maxScroll));
+    
+    if(S.isDragging) S.scrollY=S.scrollTarget; 
+    else S.scrollY+=(S.scrollTarget-S.scrollY)*.14;
+    
+    inner.style.transform=`translate3d(0,${-S.scrollY}px,0)`; 
+    requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 }
@@ -985,7 +1125,6 @@ function seekToLine(li){ if(!S.lyricsData[li]) return; audio.currentTime=S.lyric
 
 /* ═══ API & MULTIPLE ARTIST PARSING ═══ */
 function parseArtists(str) {
-  // Split multiple artists by common conjunctions
   const split = str.split(/(?:,\s*|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+featuring\s+|\s+x\s+)/i)
                    .map(s => s.trim())
                    .filter(Boolean);
